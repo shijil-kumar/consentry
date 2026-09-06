@@ -58,3 +58,8 @@ public/videos_raw/
 
 # The vendored c2patool tree was 55 MB of binaries that nothing calls any more.
 /bin/c2patool/
+
+# Written and re-added by `next dev` on every run. Agent instructions for this
+# machine, not part of the application.
+/AGENTS.md
+/CLAUDE.md
