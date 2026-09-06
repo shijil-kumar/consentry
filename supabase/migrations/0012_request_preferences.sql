@@ -1,0 +1,3 @@
+-- Generation preferences (language + video_style talking_head|scene) as a side
+-- table on approval_requests; RLS: parties + admin read, service-only writes.
+-- Applied live 2026-07-18.

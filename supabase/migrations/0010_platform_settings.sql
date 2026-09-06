@@ -1,0 +1,6 @@
+-- Admin-controlled platform economics (take_rate_bps, credit_packs with bonus_bps),
+-- update_platform_setting RPC (admin-only, range-checked, audited),
+-- activate_license reads take-rate from settings + notifies creator ('license_earned'),
+-- buy_credits validates packs from settings and credits amount+bonus.
+-- Full SQL applied live 2026-07-17 (see apply_migration platform_settings_and_packs
+-- + fix_activate_license_notify); definitive definitions live in the database.

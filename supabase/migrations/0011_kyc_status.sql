@@ -1,0 +1,3 @@
+-- Creator identity verification (KYC-lite): profiles.kyc_status ('none'|'verified'),
+-- admin-only set_kyc_status RPC (audited), kyc_verified surfaced in public_listings,
+-- flagship demo creators seeded verified. Applied live 2026-07-17.

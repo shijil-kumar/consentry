@@ -1,0 +1,11 @@
+# Vercel upload filter (replaces .gitignore semantics for deploys)
+node_modules
+.next
+.git
+.env*
+!.env.example
+bin
+public/videos_raw
+docs
+tests
+scripts/probe-*.ts

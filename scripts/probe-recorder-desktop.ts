@@ -1,0 +1,28 @@
+import { config } from "dotenv"; import path from "node:path";
+config({ path: path.resolve(process.cwd(), ".env.local") });
+import { createClient } from "@supabase/supabase-js";
+import { chromium } from "playwright";
+const URL_ = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const admin = createClient(URL_, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } });
+(async () => {
+  const { data: prof } = await admin.from("profiles").select("id").eq("role","creator").limit(1).single();
+  const { data: u } = await admin.auth.admin.getUserById(prof!.id);
+  const { data: link } = await admin.auth.admin.generateLink({ type: "magiclink", email: u.user!.email! });
+  const pub = createClient(URL_, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, { auth: { persistSession: false } });
+  const { data: sess } = await pub.auth.verifyOtp({ token_hash: link.properties!.hashed_token, type: "magiclink" });
+  const ref = new URL(URL_).hostname.split(".")[0];
+  const b = await chromium.launch({ args:["--use-fake-ui-for-media-stream","--use-fake-device-for-media-stream"] });
+  const ctx = await b.newContext({ viewport:{width:1440,height:900}, permissions:["camera","microphone"] });
+  await ctx.addCookies([{ name:`sb-${ref}-auth-token`, value:"base64-"+Buffer.from(JSON.stringify(sess!.session)).toString("base64"), domain:"consentry.app", secure:true, path:"/", sameSite:"Lax" as const }]);
+  const p = await ctx.newPage();
+  await p.goto("https://consentry.app/creator/consent", { waitUntil:"networkidle" });
+  await p.evaluate(() => document.querySelector('div.fixed.bottom-3[class*="z-["]')?.remove());
+  await p.getByRole("button", { name:/Start camera/i }).first().click();
+  await p.waitForTimeout(2500);
+  const box = await p.locator("video").first().boundingBox();
+  const sticky = await p.evaluate(() => [...document.querySelectorAll("div")].some(d => d.className.includes("fixed inset-x-0 bottom-0") && getComputedStyle(d).display !== "none"));
+  console.log("desktop landscape frame:", box && `${Math.round(box.width)}x${Math.round(box.height)}`);
+  console.log("mobile sticky bar leaks onto desktop:", sticky);
+  await p.screenshot({ path: "C:/Temp/claude/C--Users-Arjun-Kumar-SAAS-Testing/426decb9-eb4c-4fc7-a7ca-c599a706dc0a/scratchpad/recorder/desktop-1440.png" });
+  await b.close();
+})();

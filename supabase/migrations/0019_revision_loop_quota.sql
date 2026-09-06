@@ -1,0 +1,14 @@
+-- (applied live 2026-07-28) BUGFIX: create_generation counted EVERY non-failed
+-- generation against the licence quota, including versions the celebrity sent
+-- back ('changes_requested') or refused ('rejected').
+--
+-- On the 1-video tier — the cheapest and most common — a celebrity tapping
+-- "Request changes" permanently locked the brand out: they had paid, been asked
+-- for a revision, and could not submit one. The revision loop the landing page
+-- sells ("approve it, ask for changes, or decline") could never close.
+--
+-- A revision the celebrity asked for, and a version they refused, must not burn
+-- the buyer's quota. Only work in flight or actually delivered counts.
+-- Full function body is redefined in the live DB; the material change is:
+--   select count(*) ... where license_id = v_lic.id
+--     and status not in ('failed','changes_requested','rejected');

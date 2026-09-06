@@ -1,0 +1,60 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+!.env.example
+
+# vendored binary (downloaded at go-live; see GO_LIVE.md) + generated assets
+/bin/c2patool/*
+!/bin/c2patool/c2patool
+!/bin/c2patool/c2patool.exe
+/assets/mock-raw.mp4
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+.vercel
+public/videos_raw/
+
+# ── added for the public repository ────────────────────────────────────────
+# Signing material never belongs in a repo, even the published c2patool sample
+# pair: supply C2PA_CERT_PEM / C2PA_KEY_PEM instead (see .env.example).
+/assets/c2pa/
+*.key
+
+# The vendored c2patool tree was 55 MB of binaries that nothing calls any more.
+/bin/c2patool/

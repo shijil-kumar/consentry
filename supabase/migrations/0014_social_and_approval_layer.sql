@@ -1,0 +1,13 @@
+-- Social + approval layer (applied live 2026-07-22): fan role + new generation
+-- statuses (enum additions), follows (own-rows RLS + public_follow_counts
+-- definer view), profiles.no_go_list, generations.version/preview_path/
+-- review_deadline, licenses.previews_used, approval_events (immutable),
+-- approval_tokens (service-only), star_requests + vote_star RPC,
+-- avatar_views (sample-labeled), approval_action RPC (token-auth, definer).
+-- Definitive definitions live in the database.
+-- + public_registry view (delivered generations by handle, public-safe fields only).
+-- + grant select (version, preview_path, review_deadline) on generations to authenticated (raw_output_url stays revoked).
+
+-- (applied live 2026-07-23) handle_new_user now honours role='fan' from signup
+-- metadata; previously any non-creator collapsed to 'buyer'. Fans still get a
+-- personal org row (unused by fan surfaces) so profiles.org_id stays NOT NULL.

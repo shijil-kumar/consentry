@@ -1,0 +1,1 @@
+-- tone ('natural'|'excited'|'calm'|'warm'|'confident') on request_preferences. Applied live 2026-07-18.
