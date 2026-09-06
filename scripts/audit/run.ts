@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 // Pre-deploy audit — one command, twelve areas.
 //
 //   npm run audit              → against production (consentry.app)

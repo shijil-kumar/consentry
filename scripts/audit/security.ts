@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 // Audit areas 1–4, 8, 10: secrets, authorization/IDOR, session integrity,
 // mass assignment, webhook signatures, security headers.
 //

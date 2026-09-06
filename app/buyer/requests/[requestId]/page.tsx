@@ -4,7 +4,6 @@ import { requireProfile } from "@/lib/auth";
 import { AppShell } from "@/components/app-shell";
 import { RequestWorkspace, type WorkspaceData } from "@/components/request-workspace";
 import { engineHasCredentials } from "@/lib/providers";
-import { supabaseAdmin } from "@/lib/supabase/admin";
 import { ArrowLeft } from "lucide-react";
 
 export const metadata = { title: "Request" };
@@ -46,12 +45,13 @@ export default async function BuyerRequestPage({
   // Which of those will actually reach a paid API right now? A lapsed
   // subscription must be visible BEFORE the brand picks the engine, not
   // discovered afterwards when the render turns out to be a replay.
-  const { data: modeRows } = await supabaseAdmin()
-    .from("platform_settings")
-    .select("key, value")
-    .in("key", engines.map((e) => `engine_mode_${e}`));
+  // Via a definer RPC (migration 0029), not the service-role client. This page
+  // used to import the key that bypasses every RLS policy in the database in
+  // order to read two operational flags; the repository's own lint rule
+  // forbids that import here, and it was right to.
+  const { data: modeRows } = await supabase.rpc("get_engine_modes");
   const replayEngines = engines.filter((e) => {
-    const mode = (modeRows ?? []).find((r) => r.key === `engine_mode_${e}`)?.value as string | undefined;
+    const mode = (modeRows ?? []).find((r: { engine: string }) => r.engine === e)?.mode as string | undefined;
     if (mode === "replay") return true;
     if (mode === "live") return false;
     return !engineHasCredentials(e);   // 'auto'

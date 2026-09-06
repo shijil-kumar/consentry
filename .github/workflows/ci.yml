@@ -1,0 +1,84 @@
+name: CI
+
+# Runs on every push and every pull request, and is meant to be a required
+# check: nothing here is allowed to fail softly. There is no continue-on-error
+# in this file on purpose — a step that cannot block a merge is decoration.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    env:
+      # The suites below never reach a real provider — lib/providers/tavus.ts
+      # checks the variable is PRESENT before it builds a request, and the test
+      # stubs fetch. A placeholder is enough, and no real key belongs in CI.
+      TAVUS_API_KEY: ci-placeholder
+      TAVUS_WEBHOOK_TOKEN_SECRET: ci-placeholder
+      NODE_ENV: test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      # C2PA signing is one of the few genuinely interesting things in this
+      # codebase, so CI signs for real rather than skipping the tests that
+      # cover it. The certificate is generated here and thrown away with the
+      # runner: it is untrusted by design, which is exactly what the pipeline
+      # expects when no CA-issued certificate is configured. No key is
+      # committed, and none is stored as a repository secret.
+      - name: Generate a throwaway ES256 signing certificate
+        run: |
+          set -euo pipefail
+          openssl ecparam -name prime256v1 -genkey -noout -out key.pem
+          openssl req -new -x509 -key key.pem -sha256 -days 365 \
+            -subj "/CN=Consentry CI Test Signer/O=Consentry/C=IN" \
+            -addext "basicConstraints=critical,CA:FALSE" \
+            -addext "keyUsage=critical,digitalSignature" \
+            -addext "extendedKeyUsage=critical,emailProtection" \
+            -out cert.pem
+          openssl pkcs8 -topk8 -nocrypt -in key.pem -out key.pk8.pem
+          {
+            echo "C2PA_CERT_PEM<<C2PA_EOF"
+            cat cert.pem
+            echo "C2PA_EOF"
+            echo "C2PA_KEY_PEM<<C2PA_EOF"
+            cat key.pk8.pem
+            echo "C2PA_EOF"
+          } >> "$GITHUB_ENV"
+          rm -f key.pem cert.pem key.pk8.pem
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npm run lint
+
+      # test:ci is the subset that needs no account anywhere. The suites left
+      # out (RLS, the phase1/2/34 flows, the live-LLM check) each require a
+      # Supabase project or an Anthropic key and a running server, so they are
+      # run against a real environment rather than pretended at here.
+      - name: Test
+        run: npm run test:ci
+
+      - name: Build
+        run: npm run build
+        env:
+          # The build only needs these to exist; it never connects.
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder

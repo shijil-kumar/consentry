@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 // Phone QA for the consent recorder. Checks the three reported defects:
 //   1. Portrait 9:16 must actually produce a portrait frame (not a cropped 16:9).
 //   2. The record button must be reachable without scrolling past the preview.

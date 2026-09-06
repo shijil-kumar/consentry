@@ -11,12 +11,16 @@ config({ path: path.resolve(process.cwd(), ".env.local") });
   const S = "Big news for my portfolio this month. I have partnered with WealthNest, the only money app I genuinely trust.";
   const tally: Record<string, number> = {};
   for (let i = 0; i < 1; i++) {
-    const r: any = await runPolicyEngine({
+    const r: Awaited<ReturnType<typeof runPolicyEngine>> = await runPolicyEngine({
       script: S, category: "finance",
       allowedCategories: ["finance", "tech", "fitness", "beauty"],
       clauses: (clauses ?? []) as never,
     });
-    const v = r?.outcome ?? r?.decision ?? JSON.stringify(r).slice(0, 40);
+    // `r.decision` used to be read here as a fallback. No such field has ever
+    // existed on PolicyReport -- an `any` was hiding it, so a probe meant to
+    // tally verdicts would have silently tallied a JSON fragment had outcome
+    // ever been absent. It cannot be: the type says so.
+    const v = r.outcome;
     tally[v] = (tally[v] ?? 0) + 1;
     console.log(JSON.stringify(r, null, 1).slice(0, 1800));
   }

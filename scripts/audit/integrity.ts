@@ -134,10 +134,11 @@ export async function auditMoney() {
   // 6c. RECONCILIATION: for every org, sum(ledger deltas) must equal the wallet
   //     balance. This is the check that catches silent drift.
   const { data: wallets } = await admin.from("credit_wallets").select("org_id, balance_paise");
-  let reconciled = 0, drifted: string[] = [];
+  let reconciled = 0;
+  const drifted: string[] = [];
   for (const w of wallets ?? []) {
     const { data: entries } = await admin.from("credit_ledger")
-      .select("delta_paise").eq("org_id", (w as any).org_id);
+      .select("delta_paise").eq("org_id", w.org_id);
     const sum = (entries ?? []).reduce((acc: number, e: any) => acc + Number(e.delta_paise), 0);
     if (sum === Number((w as any).balance_paise)) reconciled++;
     else drifted.push(`org ${String((w as any).org_id).slice(0, 8)}: ledger ${sum} vs wallet ${w.balance_paise}`);

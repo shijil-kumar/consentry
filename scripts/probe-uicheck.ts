@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 // Visual + structural check of the surfaces changed in recent sessions:
 // creator photos, the desktop approval screen, the admin console detail views,
 // and the consent recorder. Captures screenshots at desktop and phone widths and

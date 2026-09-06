@@ -6,11 +6,16 @@ const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SU
   const { count } = await admin.from("consent_records").select("id", { count: "exact", head: true });
   console.log("total consent records:", count);
   const { data: orgs } = await admin.from("profiles").select("org_id, display_name, role").eq("role","creator");
-  const name = (o: string) => (orgs ?? []).find((x: any) => x.org_id === o)?.display_name ?? "?";
+  const name = (o: string) =>
+    (orgs ?? []).find((x: { org_id: string }) => x.org_id === o)?.display_name ?? "?";
   const { data } = await admin.from("consent_records")
     .select("id, status, created_at, org_id, scope").order("created_at", { ascending: false });
   for (const c of data ?? []) {
-    const s = c.scope as any;
+    // scope is jsonb: the recorder writes these three, and anything else
+    // present is not this probe's business.
+    const s = c.scope as {
+      client_duration_s?: number; measured_duration_s?: number; probe?: boolean;
+    } | null;
     console.log(`  ${c.id.slice(0,8)} ${String(c.status).padEnd(9)} ${c.created_at.slice(0,16)} org=${name(c.org_id)} dur=${s?.client_duration_s ?? "-"}/${s?.measured_duration_s ?? "-"} probe=${s?.probe ?? false}`);
   }
 })();

@@ -21,7 +21,7 @@ const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SU
   let bad = 0;
   for (const row of w ?? []) {
     const { data: led } = await admin.from("credit_ledger").select("delta_paise").eq("org_id", row.org_id);
-    const sum = (led ?? []).reduce((a, r: any) => a + Number(r.delta_paise), 0);
+    const sum = (led ?? []).reduce((a, r: { delta_paise: number }) => a + Number(r.delta_paise), 0);
     if (sum !== Number(row.balance_paise)) { bad++; console.log(`  MISMATCH org=${row.org_id.slice(0,8)} wallet=${row.balance_paise} ledger=${sum}`); }
   }
   console.log(`wallets checked=${(w ?? []).length} mismatches=${bad}`);

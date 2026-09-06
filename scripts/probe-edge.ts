@@ -57,7 +57,7 @@ const ok = (l: string, good: boolean, d: string) => {
   const junk = new FormData();
   junk.append("file", new File([new Uint8Array([1, 2, 3, 4, 5])], "notavideo.mp4", { type: "video/mp4" }));
   let r = await fetch(`${BASE}/api/inspect`, { method: "POST", body: junk });
-  let j = await r.json();
+  const j = await r.json();
   ok("corrupt 5-byte 'video' handled gracefully", r.status === 200 && j.ok === true, `HTTP ${r.status} credentialed=${j.credentialed}`);
 
   const txt = new FormData();

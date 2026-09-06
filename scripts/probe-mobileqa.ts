@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 // Mobile visual QA against production: at 375x812 and 414x896, every core page
 // must have NO horizontal scroll and must render its main heading. This is the
 // house standard — a page that scrolls sideways on a phone is a failed page.

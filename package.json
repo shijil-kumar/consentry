@@ -9,6 +9,7 @@
     "postinstall": "node scripts/fetch-binaries.mjs",
     "lint": "eslint",
     "test": "vitest run",
+    "test:ci": "vitest run tests/consent-status.test.ts tests/policy-injection.test.ts tests/media/consent-duration.test.ts tests/media/pipeline.test.ts tests/media/voice-fallback.test.ts tests/phase2/providers.test.ts tests/providers/replay.test.ts",
     "test:rls": "vitest run tests/rls",
     "test:phase1": "vitest run tests/phase1",
     "test:phase2": "vitest run tests/phase2",

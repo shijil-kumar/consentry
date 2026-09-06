@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 // What happens when a creator who ALREADY has verified consent records again?
 // Nothing in the UI stops them, and submit_consent always INSERTs, so the
 // question is what the dashboards then claim about their protection status.

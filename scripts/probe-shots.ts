@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 // Capture every screenshot for the demo runbook, straight off PRODUCTION with
 // real sessions. Automated so the whole set can be regenerated in one command
 // after any UI change — a runbook whose pictures drift from the product is
