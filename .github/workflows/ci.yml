@@ -33,8 +33,15 @@ jobs:
           node-version: 22
           cache: npm
 
+      # npm install, not npm ci. The lockfile is generated on Windows, and npm
+      # does not record the wasm32 optional sub-dependencies that only resolve
+      # on other platforms (@emnapi/runtime, needed by @img/sharp-wasm32 and
+      # @tailwindcss/oxide-wasm32-wasi). npm ci refuses the lock as out of sync
+      # on Linux because of it, no matter how the lock is regenerated from
+      # Windows. install still honours every locked version; it just resolves
+      # the platform-specific optionals this host could not know about.
       - name: Install
-        run: npm ci
+        run: npm install --no-audit --no-fund
 
       # C2PA signing is one of the few genuinely interesting things in this
       # codebase, so CI signs for real rather than skipping the tests that
